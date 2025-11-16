@@ -1,13 +1,17 @@
-import { CheckCircle, Trash2, Edit } from "lucide-react";
-import { api } from "../../api/api";
+    import { CheckCircle, Trash2, Edit } from "lucide-react";
+    import { api } from "../../api/api";
 
     export default function TaskItem({ task, reload, onEdit }: any) {
     async function toggleCompleted() {
+        try {
         await api.put(`/tasks/${task.id}`, {
-        ...task,
-        is_completed: !task.is_completed,
+             completed: !task. completed,
         });
+
         reload();
+        } catch (err) {
+        console.error(err);
+        }
     }
 
     async function remove() {
@@ -20,7 +24,7 @@ import { api } from "../../api/api";
         <div>
             <h3
             className={`font-medium ${
-                task.is_completed ? "line-through text-gray-400" : ""
+                task.completed ? "line-through text-gray-400" : ""
             }`}
             >
             {task.title}
@@ -32,7 +36,7 @@ import { api } from "../../api/api";
             <button onClick={toggleCompleted}>
             <CheckCircle
                 className={`${
-                task.is_completed ? "text-green-500" : "text-gray-400"
+                task.completed ? "text-green-500" : "text-gray-400"
                 }`}
                 size={22}
             />

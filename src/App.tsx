@@ -12,6 +12,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Rota login */}
+      <Route path="/login" element={<LoginPage />} />
 
         {/* ROTA PÚBLICA */}
         <Route path="/" element={<LoginPage />} />

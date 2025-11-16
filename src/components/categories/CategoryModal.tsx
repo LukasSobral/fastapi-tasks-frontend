@@ -21,7 +21,7 @@ export default function CategoryModal({ open, setOpen, category, reload }: any) 
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="max-w-sm z-[9999]" >
         <DialogTitle>{isEditing ? "Editar Categoria" : "Nova Categoria"}</DialogTitle>
 
         <div className="space-y-4 mt-4">

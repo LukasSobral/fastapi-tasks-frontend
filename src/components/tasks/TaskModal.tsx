@@ -3,7 +3,14 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { api } from "../../api/api";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "../ui/select";
 
 export default function TaskModal({ open, setOpen, task, reload }: any) {
   const isEditing = !!task;
@@ -12,8 +19,32 @@ export default function TaskModal({ open, setOpen, task, reload }: any) {
   const [description, setDescription] = useState(task?.description ?? "");
   const [categoryId, setCategoryId] = useState(task?.category_id ?? "");
 
+  const [categories, setCategories] = useState<any[]>([]);
+
+  // Carrega todas as categorias ao abrir o modal
+  useEffect(() => {
+    async function fetchCategories() {
+      const res = await api.get("/categories/");
+      setCategories(res.data);
+    }
+    fetchCategories();
+  }, []);
+
+  // Atualiza ao abrir modal no modo edição
+  useEffect(() => {
+    if (task) {
+      setTitle(task.title);
+      setDescription(task.description);
+      setCategoryId(task.category_id ?? "");
+    }
+  }, [task]);
+
   async function handleSubmit() {
-    const payload = { title, description, category_id: Number(categoryId) };
+    const payload = {
+      title,
+      description,
+      category_id: categoryId ? Number(categoryId) : null,
+    };
 
     if (isEditing) {
       await api.put(`/tasks/${task.id}`, payload);
@@ -27,7 +58,7 @@ export default function TaskModal({ open, setOpen, task, reload }: any) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md z-[9999]">
         <DialogHeader>
           <DialogTitle>
             {isEditing ? "Editar Tarefa" : "Nova Tarefa"}
@@ -54,12 +85,20 @@ export default function TaskModal({ open, setOpen, task, reload }: any) {
           </div>
 
           <div>
-            <Label>Categoria (ID)</Label>
-            <Input
-              placeholder="Ex: 3"
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-            />
+            <Label>Categoria</Label>
+            <Select value={String(categoryId)} onValueChange={setCategoryId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione uma categoria" />
+              </SelectTrigger>
+
+              <SelectContent>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.id} value={String(cat.id)}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <Button className="w-full mt-4" onClick={handleSubmit}>

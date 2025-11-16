@@ -34,7 +34,7 @@ export default function Dashboard() {
   if (loading)
     return <div className="p-10 text-center animate-pulse">Carregando...</div>;
 
-  const completed = tasks.filter((t) => t.is_completed).length;
+  const completed = tasks.filter((t) => t.completed).length;
   const progress = tasks.length ? Math.round((completed / tasks.length) * 100) : 0;
 
   // Últimos 7 dias
@@ -44,25 +44,31 @@ export default function Dashboard() {
     return d.toISOString().split("T")[0];
   });
 
-  // Dados para gráficos
+  // 🔥 Função segura para comparar datas
+  const iso = (dt: string | null | undefined) =>
+    dt ? new Date(dt).toISOString().slice(0, 10) : null;
+
+  // 📈 LINE CHART
   const lineData = last7.map((date) => ({
     date: date.slice(5),
     completed: tasks.filter(
-      (t) => t.is_completed && t.completed_at?.startsWith(date)
+      (t) => t.completed && iso(t.completed_at) === date
     ).length,
   }));
 
+  // 📊 BAR CHART
   const barData = last7.map((date) => ({
     date: date.slice(5),
-    created: tasks.filter((t) => t.created_at?.startsWith(date)).length,
+    created: tasks.filter((t) => iso(t.created_at) === date).length,
     completed: tasks.filter(
-      (t) => t.is_completed && t.completed_at?.startsWith(date)
+      (t) => t.completed && iso(t.completed_at) === date
     ).length,
   }));
 
+  // 🔥 HEATMAP — já estava funcionando
   const heatmapWeekly = Array(7).fill(0);
   tasks.forEach((t) => {
-    if (t.is_completed && t.completed_at) {
+    if (t.completed && t.completed_at) {
       const day = new Date(t.completed_at).getDay();
       heatmapWeekly[day]++;
     }

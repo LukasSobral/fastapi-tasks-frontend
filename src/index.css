@@ -5,6 +5,14 @@ html, body, #root {
 }
 
 body {
-  background-color: #f7f7f8; /* cinza premium SaaS */
+  background-color: #f7f7f8;
   color: #0f0f0f;
+}
+
+[data-state="open"] {
+  z-index: 9999 !important;
+}
+
+.fixed.inset-0.bg-black\/50 {
+  z-index: 9998 !important;
 }
